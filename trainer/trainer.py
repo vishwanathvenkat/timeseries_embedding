@@ -2,16 +2,18 @@ from models.transformer import Transformer
 from torch.optim import Adam
 from torch import nn 
 import torch
+from models.LSTM_autoencoder import LSTMAutoencoder
 from torch.utils.tensorboard import SummaryWriter
+import os
 
 
 class Trainer():
-    def __init__(self, path):
-        self.model = Transformer(dim_model=32, num_heads=2, dim_feedforward=256, num_encoder_layers=2, num_decoder_layers=2, dropout_p=0.1)
+    def __init__(self, path, model_name='LSTM_autoencoder'):
+        self.model = model_map[model_name]()
         self.optimizer = Adam(self.model.parameters(), lr=0.001)
         self.loss_fn = nn.MSELoss()
-        self.path = path
-        self.summary_writer = SummaryWriter(path)
+        self.model_path = os.path.join(path, 'model.pth')
+        self.summary_writer = SummaryWriter(os.path.join(path, 'runs'))
     
     def train(self, data, epoch, num_epochs):
         self.model.train()
@@ -19,9 +21,9 @@ class Trainer():
         for batch in data:
             inputs = batch[0]
             self.optimizer.zero_grad()
-
-            outputs, _ = self.model(inputs, inputs)
-            loss = self.loss_fn(outputs, inputs)
+            target = inputs
+            encoded_output, outputs = self.model(inputs)
+            loss = self.loss_fn(outputs, target)
             train_loss += loss.item()
             loss.backward()
             self.optimizer.step()
@@ -37,7 +39,7 @@ class Trainer():
         with torch.no_grad():
             for batch in data:
                 inputs = batch[0]
-                outputs, _ = self.model(inputs)
+                _, outputs = self.model(inputs)
                 loss = self.loss_fn(outputs, inputs)
                 val_loss += loss.item()
                 self.summary_writer.add_scalar('Validation Loss', val_loss, epoch)
@@ -49,5 +51,10 @@ class Trainer():
 
 
     def save(self):
-        torch.save(self.model.state_dict(), self.path)
+        torch.save(self.model.state_dict(), self.model_path)
         self.summary_writer.close()
+
+
+model_map = {
+    'LSTM_autoencoder': LSTMAutoencoder
+}

@@ -8,7 +8,7 @@ is_test_train_split = True
 
 def train():
 
-    train_data, val_data = DataController(data_path, is_test_train_split=is_test_train_split, batch_size=32)()
+    train_data, val_data = DataController(data_path, is_test_train_split=is_test_train_split, batch_size=64)()
 
     trainer = Trainer(output_path)
 
@@ -19,12 +19,6 @@ def train():
             trainer.val(val_data, epoch, num_epochs)
     
     trainer.save()
-
-
-
-
-
-
 
 if __name__=='__main__':
     

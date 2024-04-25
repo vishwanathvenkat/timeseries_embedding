@@ -83,4 +83,4 @@ def generate_all_data(time_stamps, extend_dims = True):
 # Generate and save data
 time_stamps = np.linspace(0, 1, 20)
 data = generate_all_data(time_stamps, extend_dims=True)
-np.save('./data/sample.npy', data.astype(np.float32))
+np.save('../data/sample.npy', data.astype(np.float32))

@@ -1,6 +1,8 @@
 from torch import nn
 from utils import PositionalEncoding
 import math
+from functools import wraps
+
 
 """
 Notes:
@@ -18,53 +20,22 @@ class Transformer(nn.Module):
     def __init__(
         self,
         # num_tokens,
-        dim_model,
-        num_heads,
+        d_model,
+        nhead,
         num_encoder_layers,
-        num_decoder_layers,
-        dropout_p,
-        dim_feedforward
+        dropout = 0.1
     ):
         super().__init__()
 
-        # INFO
-        self.model_type = "Transformer"
-        self.dim_model = dim_model
-
+        self.dim_model = d_model
         # LAYERS
-        self.positional_encoder = PositionalEncoding(
-            dim_model=dim_model, dropout_p=dropout_p, max_len=5000
+        self.encoder = nn.TransformerEncoder(
+            nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dropout=dropout), num_encoder_layers
         )
-        # self.embedding = nn.Embedding(num_tokens, dim_model)
-        self.transformer = nn.Transformer(
-            d_model=dim_model,
-            nhead=num_heads,
-            num_encoder_layers=num_encoder_layers,
-            num_decoder_layers=num_decoder_layers,
-            dropout=dropout_p,
-            dim_feedforward=dim_feedforward
-        )
+        self.linear = nn.Linear(d_model, d_model)  # Project to same dimensionality
 
     def forward(
         self,
-        src,
-        tgt,
-    ):
-        # Src size must be (batch_size, src sequence length)
-        # Tgt size must be (batch_size, tgt sequence length)
-
-        # Embedding + positional encoding - Out size = (batch_size, sequence length, dim_model)
-        # src = self.embedding(src) * math.sqrt(self.dim_model)
-        # tgt = self.embedding(tgt) * math.sqrt(self.dim_model)
-        src = self.positional_encoder(src)
-        tgt = self.positional_encoder(tgt)
-
-        # we permute to obtain size (sequence length, batch_size, dim_model),
-        src = src.permute(1, 0, 2)
-        tgt = tgt.permute(1, 0, 2)
-
-        # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
-        transformer_out = self.transformer(src, tgt)
-        out = self.out(transformer_out)
-
-        return out
+        data):
+        encoded = self.encoder(data)
+        return self.linear(encoded)
