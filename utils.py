@@ -4,10 +4,18 @@ from torch import nn
 import numpy as np
 import torch
 from sklearn.model_selection import train_test_split
+import rasterio
 
 
-def read_data(path):
-    data = np.load(path).astype(np.float32)
+
+def read_data(path, type):
+    if type == 'raster':
+        with rasterio.open(path) as src:
+            data = src.read().astype(np.float32)  # Assuming single band
+        data = np.transpose(data, (1,2,0))
+    else:
+        # Give a message that this type is not handled and raise ValueError
+        raise ValueError('Type not handled')    
     return data
 
 

@@ -2,7 +2,8 @@ from dataLoader.dataController import DataController
 from trainer.trainer import Trainer
 from trainer.test import Test
 
-data_path = '/home/wizav/src/timeseries_embedding/data/sample.npy'
+data_path = ['/home/wizav/src/timeseries_embedding/data/clippedregunathapuram-VH (1).tif',
+             '/home/wizav/src/timeseries_embedding/data/clippedregunathapuram-VV (1).tif']
 output_path = '/home/wizav/src/timeseries_embedding/data/'
 
 is_test_train_split = True
