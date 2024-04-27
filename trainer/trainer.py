@@ -1,4 +1,3 @@
-from models.transformer import Transformer
 from torch.optim import Adam
 from torch import nn 
 import torch
@@ -9,7 +8,11 @@ import os
 
 class Trainer():
     def __init__(self, path, model_name='LSTM_autoencoder'):
-        self.model = model_map[model_name]()
+        self.model = model_map[model_name]().to('cuda')
+        # if next(self.model.parameters()).is_cuda:
+        #     print("Model has been moved to GPU successfully!")
+        # else:
+        #     print("Model is still on CPU.")
         self.optimizer = Adam(self.model.parameters(), lr=0.001)
         self.loss_fn = nn.MSELoss()
         self.model_path = os.path.join(path, 'model.pth')

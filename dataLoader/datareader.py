@@ -12,5 +12,6 @@ class DataReader:
     @property
     def to_tensor(self):
         # Exception to be handled if data is not available
-        return convert_data_to_tensor(self.data)
+        data =  convert_data_to_tensor(self.data).to('cuda')
+        return data
     

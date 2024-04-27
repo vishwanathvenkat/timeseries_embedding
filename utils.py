@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 
 def read_data(path):
-    data = np.load(path)
+    data = np.load(path).astype(np.float32)
     return data
 
 
@@ -20,7 +20,7 @@ def convert_tensor_to_dataset(data):
 
 
 def convert_dataset_to_dataloader(dataset, batch_size, shuffle):
-    return torch.utils.data.DataLoader(dataset, batch_size, shuffle)
+    return torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
 
 
 def split_data(data):
